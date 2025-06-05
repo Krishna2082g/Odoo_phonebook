@@ -11,50 +11,87 @@
                 <field name="address"/>
                 <field name="customer"/>
                 <field name="stage_id"/>
-                <!-- Added progress field as a percentage -->
+                <field name="location"/>
                 <field name="stage_progress" widget="progressbar"/>
             </tree>
         </field>
     </record>
 
     <!-- Form View -->
- <record id="view_phone_book_form" model="ir.ui.view">
-    <field name="name">phone.book.form</field>
-    <field name="model">phone.book</field>
-    <field name="arch" type="xml">
-        <form string="Phone Book">
-            <header>
-                <field name="stage_id" widget="statusbar" options="{'clickable': True}"/>
-            </header>
-            <sheet>
-                <group>
+    <record id="view_phone_book_form" model="ir.ui.view">
+        <field name="name">phone.book.form</field>
+        <field name="model">phone.book</field>
+        <field name="arch" type="xml">
+            <form string="Phone Book">
+                <header>
+                    <field name="stage_id" widget="statusbar" options="{'clickable': True}"/>
+                </header>
+                <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="phone"/>
-                        <field name="email"/>
-                        <field name="address"/>
-                        <field name="customer"/>
-                        <!-- Removed stage_id from here -->
-                        <field name="tag_ids" widget="many2many_tags"/>
-                        <field name="active" invisible="1"/>
+                        <group>
+                            <field name="name"/>
+                            <field name="phone"/>
+                            <field name="email"/>
+                            <field name="address"/>
+                            <field name="customer"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="image_1920" widget="image" class="oe_avatar"/>
+                        </group>
+
+                        <group string="Location">
+                            <field name="location"/>
+                            <button name="action_open_location_map"
+                                    string="Open Location in Map"
+                                    type="object"
+                                    class="btn-primary"
+                                    attrs="{'invisible': [('location', '=', False)]}"/>
+                        </group>
+        
+<iframe 
+  src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3532.3487968740153!2d85.32171131506135!3d27.717611882804684!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2snp!4v1685951967000!5m2!1sen!2snp" 
+  width="90" 
+  height="200" 
+  style="border:0;" 
+  allowfullscreen="" 
+  loading="lazy" 
+  referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+
+
+
+                        <group string="Location Map" attrs="{'invisible': [('location', '=', False)]}">
+                            <field name="location"/>
+                            <div>
+                                <t t-if="record and 'location' in record and record.location and record.location.raw_value">
+                                    <iframe
+                                        t-att-src="'https://www.google.com/maps?q=' + record.location.raw_value.replace(' ', '+') + '&amp;output=embed'"
+                                        width="100%"
+                                        height="300"
+                                        style="border:0;"
+                                        allowfullscreen="true"
+                                        loading="lazy"
+                                        referrerpolicy="no-referrer-when-downgrade">
+                                    </iframe>
+                                </t>
+                            </div>
+                        </group>
+
+                        <group string="Location (for Map)">
+                            <field name="latitude"/>
+                            <field name="longitude"/>
+                            <button name="action_show_map"
+                                    string="Show on Map"
+                                    type="object"
+                                    class="oe_highlight"
+                                    attrs="{'invisible': ['|', ('latitude', '=', False), ('longitude', '=', False)]}"/>
+                        </group>
                     </group>
-                    <group>
-                        <field name="image_1920" widget="image" class="oe_avatar"/>
-                    </group>
-                </group>
- 
 
-
-
-
-
-
-
-
-                    <!-- Progress Bar Display -->
                     <group>
                         <label for="stage_progress" string="Progress"/>
-                        <!-- Added missing field -->
                         <field name="stage_progress" readonly="1" widget="progressbar"/>
                     </group>
 
@@ -95,12 +132,10 @@
                 <field name="color"/>
 
                 <templates>
-                    <!-- Column Header Template -->
+                    <!-- Column Header -->
                     <t t-name="kanban-column">
                         <div class="o_kanban_header">
-                            <strong>
-                                <t t-esc="column.label"/>
-                            </strong>
+                            <strong><t t-esc="column.label"/></strong>
                             <div class="progress mt-1" style="height: 6px;">
                                 <div class="progress-bar bg-primary" role="progressbar"
                                      t-att-style="'width:%s%%;' % column.attrs.progress if column.attrs.progress else 'width:0%;'"/>
@@ -111,7 +146,7 @@
                         </div>
                     </t>
 
-                    <!-- Card Template -->
+                    <!-- Kanban Card -->
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_kanban_record">
                             <img t-if="record.id and record.image_1920.raw_value"
@@ -129,6 +164,9 @@
                                         </li>
                                         <li t-if="record.address">
                                             <i class="fa fa-map-marker"/> <t t-out="record.address.value"/>
+                                        </li>
+                                        <li t-if="record.location">
+                                            <i class="fa fa-map-pin"/> <t t-out="record.location.value"/>
                                         </li>
                                     </ul>
                                     <div t-if="record.stage_id">

@@ -21,6 +21,40 @@ class PhoneBook(models.Model):
     message_ids = fields.One2many('mail.message', 'res_id', string='Messages', readonly=True)
     message_follower_ids = fields.One2many('mail.followers', 'res_id', string='Followers', readonly=True)
 
+    
+
+    location = fields.Char(string='Location', tracking=True)
+
+    
+
+    latitude = fields.Float(string="Latitude")
+    longitude = fields.Float(string="Longitude")
+
+    def action_show_map(self):
+        self.ensure_one()
+        if self.latitude and self.longitude:
+            url = f"https://www.google.com/maps/search/?api=1&query={self.latitude},{self.longitude}"
+            return {
+                'type': 'ir.actions.act_url',
+                'url': url,
+                'target': 'new',
+            }
+        
+
+    def action_open_location_map(self):
+        self.ensure_one()
+        if not self.location:
+            raise UserError("No location available.")
+        
+        query = self.location.replace(' ', '+')
+        url = f"https://www.google.com/maps/search/?api=1&query={query}"
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': url,
+            'target': 'new',
+        }
+
     stage_progress = fields.Integer(
     string='Stage Progress', 
     related='stage_id.progress', 
