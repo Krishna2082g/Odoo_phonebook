@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="stage_new" model="phone.call.stage">
+        <field name="name">New</field>
+        <field name="sequence">1</field>
+        <field name="progress">10</field>
+    </record>
+    <record id="stage_in_progress" model="phone.call.stage">
+        <field name="name">In Progress</field>
+        <field name="sequence">2</field>
+        <field name="progress">50</field>
+    </record>
+    <record id="stage_done" model="phone.call.stage">
+        <field name="name">Done</field>
+        <field name="sequence">3</field>
+        <field name="progress">100</field>
+    </record>
+</odoo>
+

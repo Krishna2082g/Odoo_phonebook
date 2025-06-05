@@ -1,0 +1,183 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_phone_book_tree" model="ir.ui.view">
+        <field name="name">phone.book.tree</field>
+        <field name="model">phone.book</field>
+        <field name="arch" type="xml">
+            <tree string="Phone Book">
+                <field name="name"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="address"/>
+                <field name="customer"/>
+                <field name="stage_id"/>
+                <!-- Added progress field as a percentage -->
+                <field name="stage_progress" widget="progressbar"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+ <record id="view_phone_book_form" model="ir.ui.view">
+    <field name="name">phone.book.form</field>
+    <field name="model">phone.book</field>
+    <field name="arch" type="xml">
+        <form string="Phone Book">
+            <header>
+                <field name="stage_id" widget="statusbar" options="{'clickable': True}"/>
+            </header>
+            <sheet>
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="phone"/>
+                        <field name="email"/>
+                        <field name="address"/>
+                        <field name="customer"/>
+                        <!-- Removed stage_id from here -->
+                        <field name="tag_ids" widget="many2many_tags"/>
+                        <field name="active" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="image_1920" widget="image" class="oe_avatar"/>
+                    </group>
+                </group>
+ 
+
+
+
+
+
+
+
+
+                    <!-- Progress Bar Display -->
+                    <group>
+                        <label for="stage_progress" string="Progress"/>
+                        <!-- Added missing field -->
+                        <field name="stage_progress" readonly="1" widget="progressbar"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Call History">
+                            <field name="call_history_ids">
+                                <tree editable="bottom">
+                                    <field name="start_time"/>
+                                    <field name="end_time"/>
+                                    <field name="call_type"/>
+                                    <field name="total_cost" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread" options="{'post_refresh': 'recipients'}"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_phone_book_kanban" model="ir.ui.view">
+        <field name="name">phone.book.kanban</field>
+        <field name="model">phone.book</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id" class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="address"/>
+                <field name="image_1920"/>
+                <field name="stage_id"/>
+                <field name="color"/>
+
+                <templates>
+                    <!-- Column Header Template -->
+                    <t t-name="kanban-column">
+                        <div class="o_kanban_header">
+                            <strong>
+                                <t t-esc="column.label"/>
+                            </strong>
+                            <div class="progress mt-1" style="height: 6px;">
+                                <div class="progress-bar bg-primary" role="progressbar"
+                                     t-att-style="'width:%s%%;' % column.attrs.progress if column.attrs.progress else 'width:0%;'"/>
+                            </div>
+                            <span class="badge bg-light text-dark mt-1">
+                                <t t-esc="column.count"/>
+                            </span>
+                        </div>
+                    </t>
+
+                    <!-- Card Template -->
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_kanban_record">
+                            <img t-if="record.id and record.image_1920.raw_value"
+                                 t-att-src="'/web/image/phone.book/' + record.id.raw_value + '/image_1920'"
+                                 class="oe_kanban_image oe_kanban_image_fill_left d-none d-md-block"/>
+                            <div class="oe_kanban_details d-flex flex-column justify-content-between">
+                                <div>
+                                    <strong class="o_kanban_record_title" t-if="record.name" t-out="record.name.value"/>
+                                    <ul class="list-unstyled mt-2">
+                                        <li t-if="record.phone">
+                                            <i class="fa fa-phone"/> <t t-out="record.phone.value"/>
+                                        </li>
+                                        <li t-if="record.email">
+                                            <i class="fa fa-envelope"/> <t t-out="record.email.value"/>
+                                        </li>
+                                        <li t-if="record.address">
+                                            <i class="fa fa-map-marker"/> <t t-out="record.address.value"/>
+                                        </li>
+                                    </ul>
+                                    <div t-if="record.stage_id">
+                                        <small class="text-muted">
+                                            <t t-esc="'Stage: ' + (record.stage_id.value or '')"/>
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left"/>
+                                    <div class="oe_kanban_bottom_right"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_phone_book_search" model="ir.ui.view">
+        <field name="name">phone.book.search</field>
+        <field name="model">phone.book</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="stage_id"/>
+                <filter string="Customers" name="filter_customer" domain="[('customer', '=', True)]"/>
+                <filter string="Archived" name="filter_archived" domain="[('active', '=', False)]"/>
+                <group expand="1" string="Group By">
+                    <filter name="group_by_stage" string="Stage" context="{'group_by':'stage_id'}"/>
+                    <filter name="group_by_tag" string="Tag" context="{'group_by':'tag_ids'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_phone_book" model="ir.actions.act_window">
+        <field name="name">Phone Book</field>
+        <field name="res_model">phone.book</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first contact</p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_contacts_root" name="Contacts"/>
+    <menuitem id="menu_phone_book_root" name="Phone Book" parent="menu_contacts_root" action="action_phone_book" sequence="10"/>
+</odoo>

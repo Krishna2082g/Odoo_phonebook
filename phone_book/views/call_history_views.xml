@@ -1,0 +1,76 @@
+<odoo>
+    <!-- Call History Tree -->
+    <record id="view_call_history_tree" model="ir.ui.view">
+        <field name="name">call.history.tree</field>
+        <field name="model">call.history</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="contact_id"/>
+                <field name="start_time"/>
+                <field name="end_time"/>
+                <field name="total_cost"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Call History Form (for Add a line) -->
+    <record id="view_call_history_form" model="ir.ui.view">
+        <field name="name">call.history.form</field>
+        <field name="model">call.history</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="contact_id"/>
+                        <field name="start_time"/>
+                        <field name="end_time"/>
+                        <!-- No cost_per_minute field here -->
+                        <field name="total_cost" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Main Action (for adding data) -->
+    <record id="action_call_history" model="ir.actions.act_window">
+        <field name="name">Call History</field>
+        <field name="res_model">call.history</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>You can track calls made to contacts and calculate total cost at ₹10/min.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_call_history"
+              name="Call History"
+              parent="menu_phone_book_root"
+              action="action_call_history"
+              sequence="20"/>
+
+    <!-- Total Cost Report Tree View -->
+    <record id="view_total_cost_report_tree" model="ir.ui.view">
+        <field name="name">total.cost.report.tree</field>
+        <field name="model">call.history</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="contact_id"/>
+                <field name="total_cost"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_total_cost_report" model="ir.actions.act_window">
+        <field name="name">Total Cost Report</field>
+        <field name="res_model">call.history</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_total_cost_report_tree"/>
+        <field name="context">{'search_default_groupby_contact': 1}</field>
+    </record>
+
+    <menuitem id="menu_total_cost_report"
+              name="Total Cost Report"
+              parent="menu_phone_book_root"
+              action="action_total_cost_report"
+              sequence="30"/>
+</odoo>

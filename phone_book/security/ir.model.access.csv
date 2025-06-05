@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_phone_book,access_phone_book,model_phone_book,,1,1,1,1
+access_call_history,access_call_history,model_call_history,,1,1,1,1
+access_phone_call_stage,access_phone_call_stage,model_phone_call_stage,,1,1,1,1
